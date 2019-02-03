@@ -36,7 +36,9 @@ const useTypeScript = fs.existsSync(paths.appTsConfig);
 
 // style files regexes
 const cssRegex = /\.css$/;
+const lessRegex = /\.less$/;
 const cssModuleRegex = /\.module\.css$/;
+const lessModuleRegex = /\.module\.less$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
@@ -81,6 +83,10 @@ module.exports = function(webpackEnv) {
         options: cssOptions,
       },
       {
+         loader: require.resolve('less-loader'),
+         options: cssOptions,
+      },
+      {
         // Options for PostCSS as we reference these options twice
         // Adds vendor prefixing based on your specified browser support in
         // package.json
@@ -100,7 +106,7 @@ module.exports = function(webpackEnv) {
           ],
           sourceMap: isEnvProduction && shouldUseSourceMap,
         },
-      },
+      }
     ].filter(Boolean);
     if (preProcessor) {
       loaders.push({
@@ -288,6 +294,24 @@ module.exports = function(webpackEnv) {
     module: {
       strictExportPresence: true,
       rules: [
+         //antd加载Less配置
+        {
+         oneOf: [
+         // Process JS with Babel.
+            {
+               test: /\.(js|jsx|mjs)$/,
+               include: paths.appSrc,
+               loader: require.resolve('babel-loader'),
+               options: {
+                  plugins: [
+                        // 引入样式为 css
+                        // style为true 则默认引入less
+                        ['import', { libraryName: 'antd', style: 'css' }],
+                  ]
+               }
+            }
+         ]
+      },
         // Disable require.ensure as it's not a standard language feature.
         { parser: { requireEnsure: false } },
 
@@ -301,7 +325,7 @@ module.exports = function(webpackEnv) {
               options: {
                 formatter: require.resolve('react-dev-utils/eslintFormatter'),
                 eslintPath: require.resolve('eslint'),
-                
+
               },
               loader: require.resolve('eslint-loader'),
             },
@@ -334,7 +358,7 @@ module.exports = function(webpackEnv) {
                 customize: require.resolve(
                   'babel-preset-react-app/webpack-overrides'
                 ),
-                
+
                 plugins: [
                   [
                     require.resolve('babel-plugin-named-asset-import'),
@@ -374,7 +398,7 @@ module.exports = function(webpackEnv) {
                 ],
                 cacheDirectory: true,
                 cacheCompression: isEnvProduction,
-                
+
                 // If an error happens in a package, it's possible to be
                 // because it was compiled. Thus, we don't want the browser
                 // debugger to show the original code. Instead, the code
@@ -402,6 +426,19 @@ module.exports = function(webpackEnv) {
               // See https://github.com/webpack/webpack/issues/6571
               sideEffects: true,
             },
+            {
+               test: lessRegex,
+               exclude: lessModuleRegex,
+               use: getStyleLoaders({
+                 importLoaders: 4,
+                 sourceMap: isEnvProduction && shouldUseSourceMap,
+               }),
+               // Don't consider CSS imports dead code even if the
+               // containing package claims to have no side effects.
+               // Remove this when webpack adds a warning or an error for this.
+               // See https://github.com/webpack/webpack/issues/6571
+               sideEffects: true,
+             },
             // Adds support for CSS Modules (https://github.com/css-modules/css-modules)
             // using the extension .module.css
             {
@@ -413,6 +450,15 @@ module.exports = function(webpackEnv) {
                 getLocalIdent: getCSSModuleLocalIdent,
               }),
             },
+            {
+               test: lessModuleRegex,
+               use: getStyleLoaders({
+                 importLoaders: 1,
+                 sourceMap: isEnvProduction && shouldUseSourceMap,
+                 modules: true,
+                 getLocalIdent: getCSSModuleLocalIdent,
+               }),
+             },
             // Opt-in support for SASS (using .scss or .sass extensions).
             // By default we support SASS Modules with the
             // extensions .module.scss or .module.sass
@@ -466,6 +512,24 @@ module.exports = function(webpackEnv) {
             // Make sure to add the new loader(s) before the "file" loader.
           ],
         },
+        //antd加载Less配置
+      //   {
+      //       oneOf: [
+      //       // Process JS with Babel.
+      //          {
+      //             test: /\.(js|jsx|mjs)$/,
+      //             include: paths.appSrc,
+      //             loader: require.resolve('babel-loader'),
+      //             options: {
+      //                plugins: [
+      //                      // 引入样式为 css
+      //                      // style为true 则默认引入less
+      //                      ['import', { libraryName: 'antd', style: 'css' }],
+      //                ]
+      //             }
+      //          }
+      //       ]
+      //    }
       ],
     },
     plugins: [
