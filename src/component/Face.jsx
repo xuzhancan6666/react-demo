@@ -18,9 +18,13 @@ class Face extends Component {
       return <Row type="flex" className="whole-container">
          <Col span={4} className="left-menu"><LeftMenu/></Col>
          <Col span={20} className="right-content">
-            <Head>header....</Head>
-            <Row>content</Row>
-            <Foot>footer</Foot>
+            <Row className="content-top">
+               <Head/>
+            </Row>
+            <Row className="content-body">content</Row>
+            <Row className="content-bottom">
+               <Foot/>
+            </Row>
          </Col>
       </Row>;
    }

@@ -4,15 +4,24 @@
 
    .left-menu {
       height: calc(100vh);
+      border-right: 1px solid #e8e8e8;
+
+      .ant-menu {
+         height: 100%;
+         border: none;
+      }
    }
 
    .right-content {
       height: calc(100vh);
+      flex: 1;
       display: flex;
       flex-flow: column;
 
       .content-top {
-         height: 64px;
+         height: 112px;
+         border-bottom: 1px solid #e8e8e8;
+         position: relative;
       }
 
       .content-body {
@@ -21,6 +30,7 @@
 
       .content-bottom {
          height: 64px;
+         border-top: 1px solid #e8e8e8;
       }
    }
 }
